@@ -2,19 +2,26 @@ package src.p03.c01;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 
 public class Parque implements IParque{
 
 
 	// TODO 
+	private int aforoMax;
+	private int aforoMin;
 	private int contadorPersonasTotales;
 	private Hashtable<String, Integer> contadoresPersonasPuerta;
+	private boolean acceder=true;
 	
 	
 	public Parque() {	// TODO
 		contadorPersonasTotales = 0;
 		contadoresPersonasPuerta = new Hashtable<String, Integer>();
-		// TODO
+		aforoMax=20;
+		aforoMin=0;
 	}
 
 
@@ -25,10 +32,10 @@ public class Parque implements IParque{
 		if (contadoresPersonasPuerta.get(puerta) == null){
 			contadoresPersonasPuerta.put(puerta, 0);
 		}
-		
+		//nuevo
+		comprobarAntesDeEntrar();
 		// TODO
 				
-		
 		// Aumentamos el contador total y el individual
 		contadorPersonasTotales++;		
 		contadoresPersonasPuerta.put(puerta, contadoresPersonasPuerta.get(puerta)+1);
@@ -37,8 +44,8 @@ public class Parque implements IParque{
 		imprimirInfo(puerta, "Entrada");
 		
 		// TODO
-		
-		
+		checkInvariante();
+		notifyAll();
 		// TODO
 		
 	}
@@ -46,7 +53,19 @@ public class Parque implements IParque{
 	// 
 	// TODO Método salirDelParque
 	//
-	
+	@Override
+	public void salirDelParque(String puerta) {
+		// TODO Auto-generated method stub
+		comprobarAntesDeSalir();
+		contadorPersonasTotales--;		
+		contadoresPersonasPuerta.put(puerta, contadoresPersonasPuerta.get(puerta)-1);
+		
+		imprimirInfo(puerta, "Salida");
+		checkInvariante();
+		notifyAll();
+		
+		
+	}
 	
 	private void imprimirInfo (String puerta, String movimiento){
 		System.out.println(movimiento + " por puerta " + puerta);
@@ -70,24 +89,44 @@ public class Parque implements IParque{
 	
 	protected void checkInvariante() {
 		assert sumarContadoresPuerta() == contadorPersonasTotales : "INV: La suma de contadores de las puertas debe ser igual al valor del contador del parte";
-		// TODO 
-		// TODO
+		assert contadorPersonasTotales == aforoMin : "INV: no se permiten salidas porque no hay nadie para salir";
+		assert contadorPersonasTotales == aforoMax : "INV: no se permiten entradas, aforo lleno";
+		
 		
 		
 		
 	}
 
-	protected void comprobarAntesDeEntrar(){	// TODO
-		//
-		// TODO
-		//
+	//protected void comprobarAntesDeEntrar(){	// TODO
+	protected synchronized void comprobarAntesDeEntrar(){
+		if(contadorPersonasTotales < aforoMax ) {
+			try {
+				wait();
+				
+			}catch(InterruptedException e) {
+				Thread.currentThread().interrupt();
+				Logger.getGlobal().log(Level.INFO,"interrupcion");
+			}
+			
+		}
+		
 	}
 
-	protected void comprobarAntesDeSalir(){		// TODO
-		//
-		// TODO
-		//
+	protected synchronized void comprobarAntesDeSalir(){		
+		if(contadorPersonasTotales == aforoMax) {
+			try {
+				wait();
+				
+			}catch(InterruptedException e) {
+				Thread.currentThread().interrupt();
+				Logger.getGlobal().log(Level.INFO,"interrupcion");
+			}
+			
+		}
 	}
+
+
+
 
 
 }
