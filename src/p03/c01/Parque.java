@@ -1,12 +1,15 @@
 package src.p03.c01;
 
+import java.util.ConcurrentModificationException;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
-public class Parque implements IParque{
+public class Parque implements IParque {
 
 
 	// TODO 
@@ -14,7 +17,9 @@ public class Parque implements IParque{
 	private int aforoMin;
 	private int contadorPersonasTotales;
 	private Hashtable<String, Integer> contadoresPersonasPuerta;
-	private boolean acceder=true;
+	private static Random generadorAleatorios =new Random();
+	
+
 	
 	
 	public Parque() {	// TODO
@@ -26,46 +31,60 @@ public class Parque implements IParque{
 
 
 	@Override
-	public void entrarAlParque(String puerta){		// TODO
+	public synchronized void entrarAlParque(String puerta) {		// TODO
 		
 		// Si no hay entradas por esa puerta, inicializamos
 		if (contadoresPersonasPuerta.get(puerta) == null){
 			contadoresPersonasPuerta.put(puerta, 0);
 		}
-		//nuevo
-		comprobarAntesDeEntrar();
+		
+		
 		// TODO
-				
+		comprobarAntesDeEntrar();
+		
 		// Aumentamos el contador total y el individual
-		contadorPersonasTotales++;		
+		contadorPersonasTotales=contadorPersonasTotales+1;	
+		
 		contadoresPersonasPuerta.put(puerta, contadoresPersonasPuerta.get(puerta)+1);
 		
 		// Imprimimos el estado del parque
 		imprimirInfo(puerta, "Entrada");
 		
 		// TODO
+		
 		checkInvariante();
 		notifyAll();
 		// TODO
 		
 	}
 	
+
+	
 	// 
 	// TODO Método salirDelParque
 	//
 	@Override
-	public void salirDelParque(String puerta) {
+	public synchronized void salirDelParque(String puerta) {
 		// TODO Auto-generated method stub
+		if (contadoresPersonasPuerta.get(puerta) == null){
+			contadoresPersonasPuerta.put(puerta, 0);
+		}
+		
 		comprobarAntesDeSalir();
-		contadorPersonasTotales--;		
+		
+		contadorPersonasTotales=contadorPersonasTotales-1;	
+		
 		contadoresPersonasPuerta.put(puerta, contadoresPersonasPuerta.get(puerta)-1);
 		
 		imprimirInfo(puerta, "Salida");
+		
 		checkInvariante();
 		notifyAll();
-		
+	
 		
 	}
+	
+	
 	
 	private void imprimirInfo (String puerta, String movimiento){
 		System.out.println(movimiento + " por puerta " + puerta);
@@ -89,17 +108,15 @@ public class Parque implements IParque{
 	
 	protected void checkInvariante() {
 		assert sumarContadoresPuerta() == contadorPersonasTotales : "INV: La suma de contadores de las puertas debe ser igual al valor del contador del parte";
-		assert contadorPersonasTotales == aforoMin : "INV: no se permiten salidas porque no hay nadie para salir";
-		assert contadorPersonasTotales == aforoMax : "INV: no se permiten entradas, aforo lleno";
-		
-		
-		
+		assert contadorPersonasTotales >= aforoMin : "INV: la suma de personas tiene que ser mayor o igual al aforo minimo";
+		assert contadorPersonasTotales <= aforoMax : "INV: la suma de personas tiene que ser menor o igual al aforo maximo";
 		
 	}
 
-	//protected void comprobarAntesDeEntrar(){	// TODO
-	protected synchronized void comprobarAntesDeEntrar(){
-		if(contadorPersonasTotales < aforoMax ) {
+	
+	protected  void comprobarAntesDeEntrar(){
+		while(contadorPersonasTotales== aforoMax ) {
+			
 			try {
 				wait();
 				
@@ -110,10 +127,13 @@ public class Parque implements IParque{
 			
 		}
 		
+			
+		
 	}
 
-	protected synchronized void comprobarAntesDeSalir(){		
-		if(contadorPersonasTotales == aforoMax) {
+	protected  void comprobarAntesDeSalir(){		
+		while(contadorPersonasTotales == 0 )  {
+		
 			try {
 				wait();
 				
@@ -123,6 +143,7 @@ public class Parque implements IParque{
 			}
 			
 		}
+		
 	}
 
 

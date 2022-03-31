@@ -10,6 +10,7 @@ public class ActividadEntradaPuerta implements Runnable{
 		private static final int NUMENTRADAS = 20;
 		private String puerta;
 		private IParque parque;
+		
 
 		public ActividadEntradaPuerta(String puerta, IParque parque) {
 			this.puerta = puerta;
