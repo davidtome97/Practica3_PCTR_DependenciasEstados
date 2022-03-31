@@ -9,7 +9,7 @@ public class ActividadSalidaPuerta implements Runnable{
 	private static final int NUMSALIDA = 20;
 	private String puerta;
 	private IParque parque;
-	
+	//constructor
 	public ActividadSalidaPuerta(String puerta, IParque parque) {
 		this.puerta = puerta;
 		this.parque = parque;

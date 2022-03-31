@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 public class Parque implements IParque {
 
 
-	// TODO 
+	// variables
 	private int aforoMax;
 	private int aforoMin;
 	private int contadorPersonasTotales;
