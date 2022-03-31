@@ -61,7 +61,7 @@ public class Parque implements IParque {
 
 	
 	// 
-	// TODO Método salirDelParque
+	// TODO Metodo salirDelParque
 	//
 	@Override
 	public synchronized void salirDelParque(String puerta) {
@@ -90,7 +90,7 @@ public class Parque implements IParque {
 		System.out.println(movimiento + " por puerta " + puerta);
 		System.out.println("--> Personas en el parque " + contadorPersonasTotales); //+ " tiempo medio de estancia: "  + tmedio);
 		
-		// Iteramos por todas las puertas e imprimimos sus entradas
+		// Iteramos por todas las puertas e imprimimos sus entradas.
 		for(String p: contadoresPersonasPuerta.keySet()){
 			System.out.println("----> Por puerta " + p + " " + contadoresPersonasPuerta.get(p));
 		}
